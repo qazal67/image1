@@ -1,0 +1,142 @@
+﻿Local Here(
+	(table1 = New Table( "Fractional Factorial",
+		Add Rows( 20 ),
+		New Table Variable( "Design", "Fractional Factorial" ),
+		New Script(
+			"Screening",
+			Fit Two Level Screening(
+				Y( :Air permability ),
+				X( :basis weight, :thickness, :fiber diameter )
+			)
+		),
+		New Script(
+			"Model",
+			Fit Model(
+				Effects( :basis weight, :thickness, :fiber diameter ),
+				Y( :Air permability ),
+				PERSONALITY( Standard Least Squares )
+			)
+		),
+		New Script(
+			"Evaluate Design",
+			DOE( Evaluate Design, X( :basis weight, :thickness, :fiber diameter ) )
+		),
+		New Script(
+			"DOE Dialog",
+			DOE(
+				Screening Design,
+				{Add Response(
+					Maximize, "Air permability", 0.5, 105, ., ., ., "µm4"
+				), Add Factor( Continuous, 6, 115, "basis weight", 0, "gr/cm2" ),
+				Add Factor( Continuous, 0.1, 0.7, "thickness", 0, "mm" ),
+				Add Factor( Continuous, 4, 85, "fiber diameter", 0, "µm" ),
+				Set Random Seed( 805064916 ), Center Points( 5 ), Make Design( 1 ),
+				Simulate Responses( 0 ), Save X Matrix( 0 )}
+			)
+		),
+		New Column( "Pattern",
+			Character( 7 ),
+			"Nominal",
+			Set Values(
+				{"000", "000", "000", "000", "000", "+++", "+−−", "000", "−−+",
+				"−+−", "000", "000", "", "", "", "", "", "", "", ""}
+			),
+			Set Display Width( 41 )
+		),
+		New Column( "basis weight",
+			Numeric,
+			"Continuous",
+			Format( "Best", 12 ),
+			Set Property( "Coding", {6, 115} ),
+			Set Property( "Design Role", DesignRole( Continuous ) ),
+			Set Property( "Factor Changes", Easy ),
+			Set Property( "Units", "gr/cm2" ),
+			Set Values(
+				[17, 22, 20, 23, 20, 6, 7, 6, 7, 6, 115, 113, 112, 114, 111, 56, 63,
+				64, 62, 57]
+			),
+			Set Display Width( 69 )
+		),
+		New Column( "thickness",
+			Numeric,
+			"Continuous",
+			Format( "Best", 12 ),
+			Set Property( "Coding", {0.1, 0.7} ),
+			Set Property( "Design Role", DesignRole( Continuous ) ),
+			Set Property( "Factor Changes", Easy ),
+			Set Property( "Units", "mm" ),
+			Set Values(
+				[0.14, 0.12, 0.1, 0.14, 0.18, 0.14, 0.13, 0.16, 0.14, 0.12, 0.58,
+				0.56, 0.6, 0.57, 0.58, 0.42, 0.4, 0.38, 0.36, 0.34]
+			),
+			Set Display Width( 52 )
+		),
+		New Column( "fiber diameter",
+			Numeric,
+			"Continuous",
+			Format( "Best", 12 ),
+			Set Property( "Coding", {4, 85} ),
+			Set Property( "Design Role", DesignRole( Continuous ) ),
+			Set Property( "Factor Changes", Easy ),
+			Set Property( "Units", "µm" ),
+			Set Selected,
+			Set Values(
+				[75, 84, 75, 77, 78, 56, 59, 59, 56, 58, 42, 44, 43, 43, 43, 4.9,
+				4.6, 4.8, 4.9, 5.3]
+			),
+			Set Display Width( 80 )
+		),
+		New Column( "Air permability",
+			Numeric,
+			"Continuous",
+			Format( "Best", 12 ),
+			Set Property(
+				"Response Limits",
+				{Goal( Maximize ), Lower( 0.5 ), Upper( 105 ), Importance( . )}
+			),
+			Set Property( "Units", "µm4" ),
+			Set Values(
+				[160.3139557, 191.2065217, 150.3057065, 163.2239583, 174.817029,
+				93.33333333, 102.2729701, 104.2486979, 92.55555556, 99.28472222,
+				42.98060345, 46.93551587, 45.79699074, 44.94097222, 45.49443247,
+				0.639155093, 0.54553125, 0.585263158, 0.606734182, 0.714298407]
+			),
+			Set Display Width( 84 )
+		),
+		Set Label Columns( :Pattern )
+	)) << Run Formulas;
+	New Window( "Fractional Factorial - Fit Least Squares",
+		table1 << Fit Model(
+			Y( :Air permability ),
+			Effects( :basis weight, :thickness, :fiber diameter ),
+			Personality( "Standard Least Squares" ),
+			Emphasis( "Effect Screening" ),
+			Run(
+				Profiler(
+					1,
+					Confidence Intervals( 1 ),
+					Desirability Functions( 1 ),
+					Term Value(
+						basis weight( 60.5, Lock( 0 ), Show( 1 ) ),
+						thickness( 0.4, Max( 0.7 ), Lock( 0 ), Show( 1 ) ),
+						fiber diameter(
+							44.5,
+							Min( 4 ),
+							Max( 85 ),
+							Lock( 0 ),
+							Show( 1 )
+						)
+					)
+				),
+				:Air permability << {Summary of Fit( 0 ), Analysis of Variance( 0 ),
+				Parameter Estimates( 1 ), Effect Details( 0 ), Lack of Fit( 0 ),
+				Sorted Estimates( 0 ), Plot Actual by Predicted( 1 ),
+				Plot Regression( 0 ), Plot Residual by Predicted( 1 ),
+				Plot Studentized Residuals( 1 ), Plot Effect Leverage( 0 ),
+				Plot Residual by Normal Quantiles( 0 ),
+				Box Cox Y Transformation( 1 )}
+			)
+		)
+	) << Move Window( 428, 18 ) << Size Window( 715, 666 ) <<
+	Set Window Icon( "Model" );
+)
